@@ -1,0 +1,12 @@
+enigma: main.o
+	g++ -Wall -g main.o -o enigma
+
+%.o: %.cpp
+	g++ -Wall -g -c $<
+
+main.o: error.h
+
+# <other.o>: dependants.h
+
+clean:
+	rm -f *.o enigma

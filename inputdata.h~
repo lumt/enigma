@@ -1,0 +1,10 @@
+#ifndef INPUTDATA_H
+#define INPUTDATA_H
+
+int filecheck(char* file);
+int load_plugboard(int plugconfig[26], int &configsize, char* file);
+int load_reflector(int rfconfig[26], int &configsize, char* file);
+int load_rot_files(int rotorconfig[52], int &configsize, char* file);
+void print_config(const int config[26]);
+
+#endif

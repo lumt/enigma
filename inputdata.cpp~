@@ -1,0 +1,243 @@
+#include <iostream>
+#include <fstream>
+#include <ctype.h>
+#include "errors.h"
+#include "inputdata.h"
+
+using namespace std;
+
+/* checks if file error or non numeric character appears in given file */
+int filecheck(char* file) {
+  
+  ifstream in(file);
+
+  if (!in) {
+    cerr << "error opening config file" << endl;
+    return ERROR_OPENING_CONFIGURATION_FILE;
+  }
+
+  char character;
+
+  in >> character;
+  in >> ws;
+  while (in) {
+    if (!isdigit(character)) {
+      cerr << "non numeric character found in " << file << endl;
+      return NON_NUMERIC_CHARACTER;
+    }
+    in >> character;
+  }
+
+  in.close();
+  return 0;
+}
+
+/* function to load .pb file */
+int load_plugboard(int plugconfig[26], int &configsize, char* file) {
+
+  int errorcode;
+  if ((errorcode = filecheck(file)))
+    return errorcode;
+
+  ifstream in(file);
+
+  int integer;
+  int idx = 0;
+  
+  for (int i = 0; i < 26; i++)
+    plugconfig[i] = -1;
+
+  in >> integer;
+  while (in && idx < 26) {
+    
+    if (integer < 0 || integer > 25) {
+      cerr << "invalid index" << endl;
+      return INVALID_INDEX;
+    }
+
+    for (int j = 0; j < idx; j++) {
+      if (integer == plugconfig[j]) {
+        cerr << "impossible config. (appeared twice)" << endl;
+        cerr << integer << " " <<  plugconfig[j] << endl;
+        return IMPOSSIBLE_PLUGBOARD_CONFIGURATION;
+      } else if (plugconfig[j] == -1) {
+        break;
+      }  
+    }
+
+    plugconfig[idx] = integer;
+    idx++;
+    in >> integer;
+  }
+
+  if (idx % 2 == 1) {
+    cerr << "odd plugboard para " << idx+1 << endl;
+    return INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS;
+  }
+
+  configsize = idx;
+  
+  in.close();
+  return 0;
+}
+
+/* function to load .rf file */
+int load_reflector(int rfconfig[26], int &configsize, char* file) {
+
+  int errorcode;
+  if ((errorcode = filecheck(file)))
+    return errorcode;
+  
+  ifstream in(file);
+  
+  if (!in) {
+    cerr << "error opening config file" << endl;
+    return ERROR_OPENING_CONFIGURATION_FILE;
+  }
+
+  for (int i = 0; i < 26; i++)
+    rfconfig[i] = -1;
+  
+  int integer;
+  int idx = 0;
+
+  in >> integer;
+  while(in) {
+
+    if (integer < 0 || integer > 25) {
+       cerr << "invalid index" << endl;
+       return INVALID_INDEX;
+    }
+
+    for (int j = 0; j < idx; j++) {
+      if (integer == rfconfig[j]) {
+        cerr << "invalid reflector config." << endl;
+        cerr << integer << " " << rfconfig[j] << endl;
+        return INVALID_REFLECTOR_MAPPING;
+      } else if (rfconfig[j] == -1) {
+        break;
+      }  
+    }
+
+    rfconfig[idx] = integer;
+    idx++;
+    in >> integer;
+  }
+
+  if (idx != 26) {
+    cerr << "incorrect num reflector parameters." << endl;
+    return INCORRECT_NUMBER_OF_REFLECTOR_PARAMETERS;
+  }
+
+  configsize = idx;
+  
+  in.close();
+  return 0;
+}
+
+
+/* function to load .pos file */
+
+int load_pos_file(int rotor_pos, int rotor_count, char *file) {
+
+  int errorcode;
+  if ((errorcode = filecheck(file)))
+    return errorcode;
+  
+  ifstream in(file);
+
+  int integer;
+  int idx = 0;
+
+  in >> integer;
+  while (in) {
+    
+    if (integer < 0 || integer > 25) {
+      cerr << "invalid index" << endl;
+      return INVALID_INDEX;
+    }
+
+    if (idx < 26) { 
+      for (int j = 0; j < idx; j++) {
+        if (integer == rotorconfig[j]) {
+          cerr << "invalid rotor config." << endl;
+          cerr << integer << " " << rotorconfig[j] << endl;
+          return INVALID_ROTOR_MAPPING;
+        } else if (rotorconfig[j] == -1) {
+          break;
+        }  
+      }
+    }
+
+    rotorconfig[idx] = integer;
+    idx++;
+    in >> integer
+
+  }
+
+}
+
+
+/* function to load .rot files */
+int load_rot_files(int rotorconfig[52], int &configsize, char* file) {
+
+  int errorcode;
+  if ((errorcode = filecheck(file)))
+    return errorcode;
+
+  ifstream in(file);
+  
+  if (!in) {
+    cerr << "error opening config file" << endl;
+    return ERROR_OPENING_CONFIGURATION_FILE;
+  }
+
+  for (int i = 0; i < 52; i++)
+    rotorconfig[i] = -1;
+
+  int integer;
+  int idx = 0;
+
+  configsize = 0;
+  
+  in >> integer;
+  while(in) {
+      
+    if (integer < 0 || integer > 25) {
+      cerr << "invalid index" << endl;
+      return INVALID_INDEX;
+    }
+
+    if (idx < 26) { 
+      for (int j = 0; j < idx; j++) {
+        if (integer == rotorconfig[j]) {
+          cerr << "invalid rotor config." << endl;
+          cerr << integer << " " << rotorconfig[j] << endl;
+          return INVALID_ROTOR_MAPPING;
+        } else if (rotorconfig[j] == -1) {
+          break;
+        }  
+      }
+    }
+
+    rotorconfig[idx] = integer;
+    idx++;
+    in >> integer;
+  }
+
+  configsize = idx;
+  
+  in.close();
+  return 0;
+}
+
+
+void print_config(const int config[26]) {
+  for (int i = 0; i < 26; i ++) {
+    if (config[i] == -1)
+      break;
+    cout << config[i] << " ";
+  }
+
+  cout << endl << endl;
+}

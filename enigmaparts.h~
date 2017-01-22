@@ -1,0 +1,13 @@
+#ifndef PLUGBOARD_H
+#define PLUGBOARD_H
+
+class Plugboard {
+private:
+  int config[26];
+  
+public:
+  Plugboard (int *array);
+  void print_config();
+};
+ 
+#endif
